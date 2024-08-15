@@ -2,7 +2,7 @@
 
 const App = () => {
     return (
-        <h1>React GPT</h1>
+        <h1 className="fade-in text-xl font-bold underline">React GPT</h1>
     )
 }
 
