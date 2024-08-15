@@ -1,8 +1,11 @@
 // import React from 'react'
 
+import { RouterProvider } from "react-router-dom"
+import { router } from "./router/router"
+
 const App = () => {
     return (
-        <h1 className="fade-in text-xl font-bold underline">React GPT</h1>
+        <RouterProvider router={ router }/>
     )
 }
 
