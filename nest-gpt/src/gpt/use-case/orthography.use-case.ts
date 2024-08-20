@@ -12,7 +12,22 @@ export const orthographyCheckUseCase = async( openai:OpenAI, options: Options) =
         messages: [
             {
             role: "system", 
-            content: "Eres un asistente muy útil" 
+            content: `
+            Té serán proveidos textos en español con posible errores ortográficos y gramaticales,
+            Las palabras deben existir en el diccionario de la RAE,
+            debes responder en formato JSON,
+            tu tarea es corregirlos y retornar información soluciones,
+            también debes dar un porcentaje de acierto por el usuario.
+
+            si no hay errores, debes retornar un mensaje de felicitaciones.
+
+            Ejemplo de respuesta:
+            {
+                userScore: number,
+                errors: string[], // ['error->corrección']
+                message: string, // Usa emojis para dar felicitaciones
+            }
+            `
             },
             {
             role: "user",
@@ -20,8 +35,10 @@ export const orthographyCheckUseCase = async( openai:OpenAI, options: Options) =
             }
         ],
         model: "gpt-4o-mini",
+        temperature: 0.3,
+        max_tokens: 150
     });
 
-    return completion.choices[0];
+    return JSON.parse(completion.choices[0].message.content);
 
 }
