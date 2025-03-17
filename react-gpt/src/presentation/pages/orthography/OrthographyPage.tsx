@@ -12,7 +12,7 @@ export const OrthographyPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
 
-    const handlePostMessage = (message: string) => {
+    const handlePostMessage = async(message: string) => {
         setIsLoading(true);
         setMessages((prevMessages) => [...prevMessages, { text: message, isGpt: false }]);
 
