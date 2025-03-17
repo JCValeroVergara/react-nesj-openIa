@@ -1,10 +1,10 @@
 
-export { AssistantPage } from "../pages/assistant/AssistantPage";
-export { AudioToTextPage } from "../pages/audio-to-text/AudioToTextPage"; 
-export { ImageGenerationPage } from "../pages/image-generation/ImageGenerationPage";
-export { ImageTunningPage } from "../pages/image-generation/ImageTunningPage";
-export { OrthographyPage } from "../pages/orthography/OrthographyPage";
-export { ProsConsPage } from "../pages/pros-cons/ProsConsPage";
-export { ProsConsStreamPage } from "../pages/pros-cons-stream/ProsConsStreamPage"
-export { TextToAudioPage } from "../pages/text-to-audio/TextToAudioPage";
-export { TranslatePage } from "../pages/translate/TranslatePage";
+export * from "./assistant/AssistantPage";
+export * from "./audio-to-text/AudioToTextPage"; 
+export * from "./image-generation/ImageGenerationPage";
+export * from "./image-generation/ImageTunningPage";
+export * from "./orthography/OrthographyPage";
+export * from "./pros-cons/ProsConsPage";
+export * from "./pros-cons-stream/ProsConsStreamPage"
+export * from "./text-to-audio/TextToAudioPage";
+export * from "./translate/TranslatePage";
