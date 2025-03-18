@@ -3,7 +3,7 @@ import { GptService } from './gpt.service';
 import { GptController } from './gpt.controller';
 
 @Module({
-  controllers: [GptController],
-  providers: [GptService],
+    controllers: [GptController],
+    providers: [GptService],
 })
 export class GptModule {}

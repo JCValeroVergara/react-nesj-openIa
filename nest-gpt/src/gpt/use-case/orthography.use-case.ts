@@ -4,41 +4,56 @@ interface Options {
     prompt: string;
 }
 
-export const orthographyCheckUseCase = async( openai:OpenAI, options: Options) => {
+export const orthographyCheckUseCase = async( ollamaUrl:string, options: Options) => {
 
     const { prompt } = options;
 
-    const completion = await openai.chat.completions.create({
-        messages: [
-            {
-            role: "system", 
-            content: `
-            Té serán proveidos textos en español con posible errores ortográficos y gramaticales,
-            Las palabras deben existir en el diccionario de la RAE,
-            debes responder en formato JSON,
-            tu tarea es corregirlos y retornar información soluciones,
-            también debes dar un porcentaje de acierto por el usuario.
+    const response = await fetch(ollamaUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            model: "llama3", // Modelo de Ollama
+            prompt: `
+            Te serán proveídos textos en español con posibles errores ortográficos y gramaticales.
+            Las palabras deben existir en el diccionario de la RAE.
+            Debes responder en formato JSON.
+            Tu tarea es corregirlos y retornar información sobre las soluciones.
+            También debes dar un porcentaje de acierto del usuario.
 
-            si no hay errores, debes retornar un mensaje de felicitaciones.
+            Si no hay errores, debes retornar un mensaje de felicitaciones.
 
             Ejemplo de respuesta:
             {
-                userScore: number,
-                errors: string[], // ['error->corrección']
-                message: string, // Usa emojis para dar felicitaciones
+                "userScore": number,
+                "errors": string[], // ['error->corrección']
+                "message": string // Usa emojis para dar felicitaciones
             }
-            `
-            },
-            {
-            role: "user",
-            content: prompt
-            }
-        ],
-        model: "gpt-4o-mini",
-        temperature: 0.3,
-        max_tokens: 150
+
+            Texto del usuario:
+            ${prompt}
+            `,
+            stream: false
+        })
     });
 
-    return JSON.parse(completion.choices[0].message.content);
+    const jsonResponse = await response.json();
+
+    try {
+        // Expresión regular para extraer el contenido JSON
+        const jsonMatch = jsonResponse.response.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error("No se encontró un JSON válido en la respuesta.");
+        }
+    const parsedData = JSON.parse(jsonMatch[0]);
+
+    // Asegurar que la respuesta tiene el rol "system"
+    return {
+        role: 'system',
+        data: parsedData,
+    };
+    } catch (error) {
+        console.error("Error al parsear JSON:", error);
+        return { error: "No se pudo interpretar la respuesta de Ollama." };
+    }
 
 }
