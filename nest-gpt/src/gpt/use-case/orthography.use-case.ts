@@ -4,56 +4,50 @@ interface Options {
     prompt: string;
 }
 
-export const orthographyCheckUseCase = async( ollamaUrl:string, options: Options) => {
+export const orthographyCheckUseCase = async( openai: OpenAI,  options: Options) => {
 
     const { prompt } = options;
 
-    const response = await fetch(ollamaUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            model: "llama3", // Modelo de Ollama
-            prompt: `
-            Te serán proveídos textos en español con posibles errores ortográficos y gramaticales.
-            Las palabras deben existir en el diccionario de la RAE.
-            Debes responder en formato JSON.
-            Tu tarea es corregirlos y retornar información sobre las soluciones.
-            También debes dar un porcentaje de acierto del usuario.
-
-            Si no hay errores, debes retornar un mensaje de felicitaciones.
-
-            Ejemplo de respuesta:
+    const completion = await openai.chat.completions.create({
+        messages: [
             {
-                "userScore": number,
-                "errors": string[], // ['error->corrección']
-                "message": string // Usa emojis para dar felicitaciones
-            }
+                role: 'system',
+                content: `
+                Te serán proveídos textos en español con posibles errores ortográficos y gramaticales,
+                Las palabras usadas deben de existir en el diccionario de la Real Academia Española,
+                Debes de responder en formato JSON, 
+                tu tarea es corregirlos y retornar información soluciones, 
+                también debes de dar un porcentaje de acierto por el usuario,
+                
 
-            Texto del usuario:
-            ${prompt}
-            `,
-            stream: false
-        })
+                Si no hay errores, debes de retornar un mensaje de felicitaciones.
+
+                Ejemplo de salida:
+                {
+                userScore: number,
+                errors: string[], // ['error -> solución']
+                message: string, //  Usa emojis y texto para felicitar al usuario
+                }
+                
+                
+                `,
+            },
+            {
+                role: 'user',
+                content: prompt,
+            },
+        ],
+            model: 'gpt-3.5-turbo-1106',
+            temperature: 0.3,
+            max_tokens: 150,
+            response_format: {
+                type: 'json_object',
+            },
     });
 
-    const jsonResponse = await response.json();
+    // console.log(completion);
+    const jsonResp = JSON.parse(completion.choices[0].message.content);
 
-    try {
-        // Expresión regular para extraer el contenido JSON
-        const jsonMatch = jsonResponse.response.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error("No se encontró un JSON válido en la respuesta.");
-        }
-    const parsedData = JSON.parse(jsonMatch[0]);
-
-    // Asegurar que la respuesta tiene el rol "system"
-    return {
-        role: 'system',
-        data: parsedData,
-    };
-    } catch (error) {
-        console.error("Error al parsear JSON:", error);
-        return { error: "No se pudo interpretar la respuesta de Ollama." };
-    }
+    return jsonResp;
 
 }
