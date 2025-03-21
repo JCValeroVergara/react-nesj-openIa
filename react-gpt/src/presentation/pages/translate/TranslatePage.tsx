@@ -9,6 +9,7 @@ interface Message {
     isGpt: boolean;
 }
 
+
 const languages = [
     { id: 'alemán', text: 'Alemán' },
     { id: 'árabe', text: 'Árabe' },
