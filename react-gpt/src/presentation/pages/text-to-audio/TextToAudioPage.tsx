@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { GptMessage, MyMessage, TypingLoader, TextMessageBoxSelect, GptMessageAudio } from '../../components';
-import { textToAudioUseCase } from '../../../core/use-cases/text-to-audio.use-case';
+import { textToAudioUseCase } from '../../../core/use-cases/text/text-to-audio.use-case';
 
 
 
